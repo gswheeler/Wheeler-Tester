@@ -16,9 +16,9 @@ import static org.junit.Assert.*;
  *
  * @author Greg
  */
-public class TestAddContainsRemove {
+public class AddContainsRemoveTest {
     
-    public TestAddContainsRemove() {
+    public AddContainsRemoveTest() {
     }
     
     @BeforeClass
