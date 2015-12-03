@@ -39,7 +39,10 @@ public class FileHandler extends wheeler.generic.data.FileHandler {
         }
         
         // Compose and return the filepath
-        return composeFilepath(programFolder, LogicHandler.getCallingMethod(indirection + 1));
+        return composeFilepath(
+                composeFilepath(programFolder, "test"),
+                LogicHandler.getCallingMethod(indirection + 1)
+            );
     }
     
 }
