@@ -18,7 +18,7 @@ public class GetTestFolderTest {
     @Test
     public void testGetTestFolder() throws Exception{
         String expected =
-                "C:\\Program Files\\Wheeler\\Wheeler Tester"
+                TestFileHandler.expectedWheelerTesterFolder
                 + "\\wheelertester.data.filehandler.GetTestFolderTest.testGetTestFolder"
             ;
         String actual = TestFileHandler.getTestFolder(0);

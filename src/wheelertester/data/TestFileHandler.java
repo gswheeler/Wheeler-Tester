@@ -10,6 +10,9 @@ package wheelertester.data;
  */
 public class TestFileHandler extends wheelertester.data.FileHandler{
     
+    /** The parent folder of the folders in which we expect to be storing and using test data */
+    public static final String expectedWheelerTesterFolder = "C:\\Program Files\\Wheeler\\Wheeler Tester\\test";
+    
     public static String getTestFolder(int indirection) throws Exception{
         return FileHandler.getTestFolder(indirection + 1);
     }
