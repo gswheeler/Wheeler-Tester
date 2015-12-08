@@ -21,7 +21,7 @@ public class GetTestFolderTest {
                 TestFileHandler.expectedWheelerTesterFolder
                 + "\\wheelertester.data.filehandler.GetTestFolderTest.testGetTestFolder"
             ;
-        String actual = TestFileHandler.getTestFolder(0);
+        String actual = TestFileHandler.callGetTestFolder(0);
         assertEquals("Did not get the expected test folder", expected, actual);
         FileHandler.ensureFolderExists(actual);
         assertTrue("Failed to create the test folder", FileHandler.folderExists(actual));
@@ -44,7 +44,7 @@ public class GetTestFolderTest {
         assertFalse("Failed to delete the tagged test folder", FileHandler.folderExists(actual));
     }
     private String testGetTestFolderWithArgumentTagWorker(String tag) throws Exception{
-        return TestFileHandler.getTestFolder(tag, 1);
+        return TestFileHandler.callGetTestFolder(tag, 1);
     }
     
 }
