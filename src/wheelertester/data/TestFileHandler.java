@@ -13,11 +13,11 @@ public class TestFileHandler extends wheelertester.data.FileHandler{
     /** The parent folder of the folders in which we expect to be storing and using test data */
     public static final String expectedWheelerTesterFolder = "C:\\Program Files\\Wheeler\\Wheeler Tester\\test";
     
-    public static String getTestFolder(int indirection) throws Exception{
+    public static String callGetTestFolder(int indirection) throws Exception{
         return FileHandler.getTestFolder(indirection + 1);
     }
     
-    public static String getTestFolder(String argTag, int indirection) throws Exception{
+    public static String callGetTestFolder(String argTag, int indirection) throws Exception{
         return FileHandler.getTestFolder(argTag, indirection + 1);
     }
     
