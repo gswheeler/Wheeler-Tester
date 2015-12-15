@@ -14,6 +14,7 @@ import wheeler.generic.data.LogicHandler;
 import wheeler.generic.data.StringHandler;
 import wheeler.generic.structs.IStringList;
 import wheeler.generic.structs.StringLinkNode;
+import wheeler.generic.structs.StringSortedList;
 import wheeler.generic.structs.TestStringList;
 import wheeler.generic.structs.TestStringSortedList;
 import wheelertester.data.DataFactory;
@@ -29,23 +30,7 @@ public class AddContainsRemoveTest {
     public void testAddingCheckingAndRemovingItems() throws Exception{
         // Get some test data (if we failed earlier, use the data that caused us to fail)
         String testFolder = TestFileHandler.callGetTestFolder(0);
-        FileHandler.ensureFolderExists(testFolder);
-        String datafile1 = FileHandler.composeFilepath(testFolder, "data1.txt");
-        String datafile2 = FileHandler.composeFilepath(testFolder, "data2.txt");
-        String datafile3 = FileHandler.composeFilepath(testFolder, "data3.txt");
-        String[][] data;
-        if(FileHandler.fileExists(datafile1) && FileHandler.fileExists(datafile2) && FileHandler.fileExists(datafile3)){
-            String[] data0 = FileHandler.readFile(datafile1, true, true).toArray();
-            String[] data1 = FileHandler.readFile(datafile2, true, true).toArray();
-            String[] data2 = FileHandler.readFile(datafile3, true, true).toArray();
-            data = new String[3][]; data[0] = data0; data[1] = data1; data[2] = data2;
-        }else{
-            String[][] newData = DataFactory.generateFiftyStrings(); data = new String[3][];
-            data[0] = newData[0]; data[1] = newData[1]; data[2] = LogicHandler.shuffleArray(data[0]);
-            FileHandler.writeFile(data[0], true, datafile1);
-            FileHandler.writeFile(data[1], true, datafile2);
-            FileHandler.writeFile(data[2], true, datafile3);
-        }
+        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateFiftyStrings(true));
         
         // Get an array of test lists, run the test for each list using the same data
         IStringList[] lists = TestStringList.getStringLists();
@@ -54,6 +39,65 @@ public class AddContainsRemoveTest {
         // The tests all passed, delete the stored data so we start with a fresh set next time
         FileHandler.deleteFolder(testFolder);
     }
+    
+    @Test
+    public void testLargeList() throws Exception{
+        // Get some test data (if we failed earlier, use the data that caused us to fail)
+        String testFolder = TestFileHandler.callGetTestFolder(0);
+        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateTwoHundredStrings(true));
+        
+        // Get an array of test lists, run the test for each list using the same data
+        IStringList[] lists = TestStringList.getStringLists();
+        for (IStringList list : lists) testAddingCheckingAndRemovingItemsWorker(list, data);
+        
+        // The tests all passed, delete the stored data so we start with a fresh set next time
+        FileHandler.deleteFolder(testFolder);
+    }
+    
+    @Test
+    public void testMassiveSortedList() throws Exception{
+        // Get some test data (if we failed earlier, use the data that caused us to fail)
+        String testFolder = TestFileHandler.callGetTestFolder(0);
+        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateFiveThousandStrings(true));
+        
+        // StringSortedList is specially designed for handling enormous lists like these, since it has to do so while keeping the list sorted
+        // Just use the base StringSortedList; calling isValid 10,000 times on a list with an average of 2,500 items is EXPENSIVE
+        testAddingCheckingAndRemovingItemsWorker(new StringSortedList(), data);
+        
+        // The tests all passed, delete the stored data so we start with a fresh set next time
+        FileHandler.deleteFolder(testFolder);
+    }
+    
+    // Get test data from the test folder if it exists
+    private String[][] generateOrRetrieveTestData(String testFolder, String[][] newData) throws Exception{
+        // Make sure the folder exists, generate datafile paths
+        FileHandler.ensureFolderExists(testFolder);
+        String datafile1 = FileHandler.composeFilepath(testFolder, "data1.txt");
+        String datafile2 = FileHandler.composeFilepath(testFolder, "data2.txt");
+        String datafile3 = FileHandler.composeFilepath(testFolder, "data3.txt");
+        String[][] data;
+        
+        // Check if data files exist from the last time the test was run
+        if(FileHandler.fileExists(datafile1) && FileHandler.fileExists(datafile2) && FileHandler.fileExists(datafile3)){
+            // If so, collect the data
+            String[] data0 = FileHandler.readFile(datafile1, true, true).toArray();
+            String[] data1 = FileHandler.readFile(datafile2, true, true).toArray();
+            String[] data2 = FileHandler.readFile(datafile3, true, true).toArray();
+            data = new String[3][]; data[0] = data0; data[1] = data1; data[2] = data2;
+        }else{
+            // Otherwise, use the new data, saving it to file in case the next test run needs it
+            data = new String[3][];
+            data[0] = newData[0]; data[1] = newData[1]; data[2] = LogicHandler.shuffleArray(data[0]);
+            FileHandler.writeFile(data[0], true, datafile1);
+            FileHandler.writeFile(data[1], true, datafile2);
+            FileHandler.writeFile(data[2], true, datafile3);
+        }
+        
+        // Return the generated or retrieved data
+        return data;
+    }
+    
+    // Do the test work
     private void testAddingCheckingAndRemovingItemsWorker(IStringList list, String[][] data) throws Exception{
         // De-reference the data in the data array
         String[] strings = data[0]; // The strings to be added to the list in turn
@@ -81,7 +125,7 @@ public class AddContainsRemoveTest {
             list.add(strings[i]);
             if (sortedList != null) sortedList.isValid(null);
             for(int j = 0; j < pool.length; j++){
-                if(StringHandler.areEqual(strings[i], pool[j], true)){
+                if(StringHandler.areEqual(strings[i], pool[j], false)){
                     counts[j]++;
                     assertEquals(
                             "The number of times " + strings[i] + " appears in the list failed to increase correctly",
@@ -117,7 +161,7 @@ public class AddContainsRemoveTest {
         }
         for(String item : remove){
             for(int i = 0; i < pool.length; i++){
-                if(StringHandler.areEqual(item, pool[i], true)){
+                if(StringHandler.areEqual(item, pool[i], false)){
                     assertEquals("While removing " + item + ", found it the wrong number of times", counts[i], list.remove(item));
                     if (sortedList != null) sortedList.isValid(null);
                     assertEquals("Found a string in the list after removing it", 0, list.count(item));
