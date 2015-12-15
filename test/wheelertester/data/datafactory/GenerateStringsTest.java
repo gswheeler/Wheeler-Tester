@@ -31,7 +31,7 @@ public class GenerateStringsTest {
             };
         
         // Get strings
-        String[][] result = DataFactory.generateStrings(getTwoAndThreeArray(), 15);
+        String[][] result = DataFactory.generateStrings(getTwoAndThreeArray(), 15, true);
         String[] generated = result[0];
         String[] possible = result[1];
         
@@ -51,7 +51,7 @@ public class GenerateStringsTest {
         for(String str : generated){
             boolean found = false;
             for(String str2 : possible){
-                if(StringHandler.areEqual(str, str2, true)){
+                if(StringHandler.areEqual(str, str2, false)){
                     found = true;
                     break;
                 }
@@ -68,7 +68,7 @@ public class GenerateStringsTest {
             // Get the data
             String[][] values = getTwoAndThreeArray();
             int number = 1; for (String[] valuesSet : values) number = number * valuesSet.length;
-            String[][] data = DataFactory.generateStrings(values, number);
+            String[][] data = DataFactory.generateStrings(values, number, false);
             assertEquals("This test requires there to be the chance of an absense of repetition/omission", data[0].length, data[1].length);
             StringList strings = new StringList(data[0]);
             
@@ -88,6 +88,73 @@ public class GenerateStringsTest {
         }
     }
     
+    @Test
+    public void testCaseRandomization(){
+        // Get a set of items with no randomization, make sure the case is unchanged
+        String[] strings = DataFactory.generateStrings(getTwoAndTwoArray(), 20, false)[0];
+        String[] noCasePool = {"aA", "ab", "BA", "Bb"};
+        // For every generated string, make sure it shows up in the list of possible strings
+        for(String str : strings){
+            boolean found = false;
+            for(String check : noCasePool){
+                if(StringHandler.areEqual(str, check, true)){
+                    found = true;
+                    break;
+                }
+            }
+            assertTrue("Generated " + str + " in spite of having case randomization off", found);
+        }
+        
+        // Get a VERY large list with case randomization, make sure all permutations show up
+        String[] casePool = {"ab", "aB", "Ab", "AB"};
+        int count = 3;
+        while(true){
+            // Generate the strings
+            strings = DataFactory.generateStrings(getOneAndOneArray(), 100, true)[0];
+            
+            // Make sure each case permutation shows up in the data set
+            boolean allFound = true;
+            for(String str : casePool){
+                boolean found = false;
+                for(String check : strings){
+                    if(StringHandler.areEqual(str, check, true)){
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found){
+                    allFound = false;
+                    break;
+                }
+            }
+            
+            // If we found them all, we passed
+            if (allFound) break;
+            
+            // Three strikes, you're out
+            if (count-- < 0) fail("Failed to have sufficient randomization");
+        }
+        
+    }
+    
+    
+    // Return source arrays for generating strings
+    protected String[][] getOneAndOneArray(){
+        String[] index0 = {"a"};
+        String[] index1 = {"B"};
+        String[][] values = new String[2][];
+        values[0] = index0;
+        values[1] = index1;
+        return values;
+    }
+    protected String[][] getTwoAndTwoArray(){
+        String[] index0 = {"a", "B"};
+        String[] index1 = {"A", "b"};
+        String[][] values = new String[2][];
+        values[0] = index0;
+        values[1] = index1;
+        return values;
+    }
     protected String[][] getTwoAndThreeArray(){
         String[] index0 = {"a", "b"};
         String[] index1 = {"a", "b", "c"};
