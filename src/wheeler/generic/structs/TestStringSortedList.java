@@ -53,6 +53,9 @@ public class TestStringSortedList extends wheeler.generic.structs.StringSortedLi
             return invalidMsg(caller, "the header's prev field was set:\n"
                     + ((header.prev.value != null) ? header.prev.value : "(null))"));
         }
+        if(header.wasRemoved()){
+            return invalidMsg(caller, "the header was marked as removed");
+        }
         if(!header.chainIndexSet()){
             return invalidMsg(caller, "the header's chain index field was not set");
         }
@@ -93,8 +96,11 @@ public class TestStringSortedList extends wheeler.generic.structs.StringSortedLi
                             + " was pointing at node instance\n" + node.prev.next.getInstanceNumber()
                             + "\nwhereas the node in question is node instance\n" + node.getInstanceNumber());
             }
+            if(node.wasRemoved()){
+                return invalidMsg(caller, "node " + count + " was in the list after having been removed");
+            }
             if(node.chainIndexSet()){
-                if(node.getChainIndex() > lastChainIndex){
+                if(node.getChainIndex() == lastChainIndex + 1){
                     lastChainIndex = node.getChainIndex();
                     lastIndexCount = count;
                 }else{
@@ -178,11 +184,6 @@ public class TestStringSortedList extends wheeler.generic.structs.StringSortedLi
         if (caller == null) throw new LogicException(message);
         DialogFactory.message(caller, message);
         return false;
-    }
-    
-    @Override
-    public TestStringSortedList getNew(){
-        return new TestStringSortedList();
     }
     
 }
