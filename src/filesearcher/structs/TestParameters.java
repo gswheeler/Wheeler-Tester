@@ -5,6 +5,7 @@
  */
 package filesearcher.structs;
 
+import javax.swing.JFrame;
 import wheeler.generic.data.StringHandler;
 
 /**
@@ -19,6 +20,11 @@ public class TestParameters extends filesearcher.structs.Parameters{
         excludePaths = new String[0];
         includeTypes = new String[0];
         excludeTypes = new String[0];
+    }
+    
+    
+    public static String[][] getIncludeExclude(String paramString, String paramType, JFrame caller){
+        return Parameters.getIncludeExclude(paramString, paramType, caller);
     }
     
     
