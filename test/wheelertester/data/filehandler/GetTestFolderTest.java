@@ -32,7 +32,7 @@ public class GetTestFolderTest {
     @Test
     public void testGetTestFolderWithArgumentTag() throws Exception{
         String expected =
-                "C:\\Program Files\\Wheeler\\Wheeler Tester"
+                TestFileHandler.expectedWheelerTesterFolder
                 + "\\wheelertester.data.filehandler.GetTestFolderTest.testGetTestFolderWithArgumentTag"
                 + "-string"
             ;
