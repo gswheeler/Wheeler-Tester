@@ -24,6 +24,7 @@ public class readWriteEqualsTest {
     public void testEqualsAndReadWriteFile() throws Exception{
         // We're going to be creating parameters files; set the ProgramFiles path
         String testFolder = TestFileHandler.getTestFolder(0);
+        FileHandler.clearFolder(testFolder);
         
         // Create the two objects to compare
         TestParameters params1 = new TestParameters();
