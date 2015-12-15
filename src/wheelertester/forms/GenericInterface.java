@@ -5,6 +5,8 @@
  */
 package wheelertester.forms;
 
+import wheeler.generic.data.LogicHandler;
+
 /**
  *
  * @author Greg
@@ -26,6 +28,7 @@ public class GenericInterface extends javax.swing.JFrame {
     public static GenericInterface getJFrame(){
         if (_instance == null){
             main(new String[0]);
+            LogicHandler.sleep(500);
         }
         return _instance;
     }
