@@ -19,7 +19,7 @@ import wheelertester.forms.GenericInterface;
 /**
  * Test the function in Parameters that splits included and excluded search parameters
  */
-public class getIncludeExcludeTest {
+public class GetIncludeExcludeTest {
     
     private final JFrame caller = GenericInterface.getJFrame();
     private final String title = "FileSearcher - GetIncludeExclude";

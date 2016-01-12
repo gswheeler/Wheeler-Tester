@@ -16,7 +16,7 @@ import wheeler.generic.data.FileHandler;
 /**
  * Write presets to file and make sure they are the same when read back. Also, make sure our Equals function works
  */
-public class readWriteEqualsTest {
+public class ReadWriteEqualsTest {
     
     @Test
     public void testEqualsAndReadWriteFile() throws Exception{

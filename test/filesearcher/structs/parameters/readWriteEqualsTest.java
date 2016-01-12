@@ -18,7 +18,7 @@ import wheeler.generic.structs.StringList;
  *
  * @author Greg
  */
-public class readWriteEqualsTest {
+public class ReadWriteEqualsTest {
     
     @Test
     public void testEqualsAndReadWriteFile() throws Exception{
