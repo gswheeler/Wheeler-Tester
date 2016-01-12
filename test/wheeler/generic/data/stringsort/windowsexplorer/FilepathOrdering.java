@@ -172,6 +172,20 @@ public class FilepathOrdering {
         }
     }
     
+    @Test
+    public void testCasePriority(){
+        // Get sorters with and without case sensitivity
+        StringSorter sorterWith = new WindowsExplorer(true);
+        StringSorter sorterWithout = new WindowsExplorer(false);
+        
+        // Test data
+        String firstByCase = "abcde";
+        String firstByValue = "aBc5e";
+        
+        assertEquals("Expected case to push the first string before the second", -1, sorterWith.compareStrings(firstByCase, firstByValue));
+        assertEquals("Expected non-case to push the first string after the second", 1, sorterWithout.compareStrings(firstByCase, firstByValue));
+    }
+    
     private void testCompareOrderedList(String[] list, StringSorter sorter){
         for(int i = 0; i < list.length; i++){
             for(int j = 0; j < list.length; j++){
