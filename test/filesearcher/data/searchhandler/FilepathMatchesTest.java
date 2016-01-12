@@ -186,4 +186,22 @@ public class FilepathMatchesTest {
         assertFalse("The folder passed a type check when the folder key was included and excluded", handler.filepathMatches(fileA, true));
     }
     
+    @Test
+    public void testIncludeFolders(){
+        // Put a "folder" understood as the type-include parameter, make sure that only folders are included in the results
+        params.includeTypes = new StringList("\\").toArray();
+        assertTrue("The folder failed to pass a check that was looking for folders only", handler.filepathMatches(fileA, true));
+        assertFalse("The file passed a check that was looking for folders only", handler.filepathMatches(fileA, false));
+        
+        // Add an extension to the type-include parameters, make sure that both folders and matching files pass
+        params.includeTypes = new StringList("\\").add("LeA.txt").toArray();
+        assertTrue("The folder failed to pass a check that was looking for both folders and files", handler.filepathMatches(fileA, true));
+        assertTrue("The file failed to pass a check that was looking for both files and folders", handler.filepathMatches(fileA, false));
+        
+        // Replace the file extension with one that doesn't match the filepath, make sure folder still passes while the file no longer does
+        params.includeTypes = new StringList("\\").add("LeB.txt").toArray();
+        assertTrue("The folder failed to pass a check that was looking for folders and a non-matching extension", handler.filepathMatches(fileA, true));
+        assertFalse("The file passed a check that was looking for folders and a non-matching extension", handler.filepathMatches(fileA, false));
+    }
+    
 }
