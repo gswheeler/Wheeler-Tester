@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import wheeler.generic.data.StringHandler;
 import wheeler.generic.structs.StringList;
+import wheeler.generic.structs.StringSimpleList;
 import wheelertester.data.DataFactory;
 
 /**
@@ -20,18 +21,21 @@ public class GenerateStringsTest {
     
     @Test
     public void basicTest(){
+        basicTest(false);
+        basicTest(true);
+    }
+    private void basicTest(boolean caseSensitive){
         // The strings we expect to be generated
-        String[] expectedPossible = {
-                "aa",
-                "ab",
-                "ac",
-                "ba",
-                "bb",
-                "bc"
-            };
+        String[] expectedPossible = (caseSensitive)
+                ? new StringSimpleList("aa").add("aA").add("a1").add("ac").add("aC")
+                                  .add("Aa").add("AA").add("A1").add("Ac").add("AC")
+                                  .add("ba").add("bA").add("b1").add("bc").add("bC")
+                                  .add("Ba").add("BA").add("B1").add("Bc").add("BC").toArray()
+                : new StringSimpleList("aa").add("a1").add("ac").add("ba").add("b1").add("bc").toArray()
+            ;
         
         // Get strings
-        String[][] result = DataFactory.generateStrings(getTwoAndThreeArray(), 15, true);
+        String[][] result = DataFactory.generateStrings(getTwoAndThreeArray(), 15, caseSensitive ? 2 : 1);
         String[] generated = result[0];
         String[] possible = result[1];
         
@@ -51,14 +55,13 @@ public class GenerateStringsTest {
         for(String str : generated){
             boolean found = false;
             for(String str2 : possible){
-                if(StringHandler.areEqual(str, str2, false)){
+                if(StringHandler.areEqual(str, str2, caseSensitive)){
                     found = true;
                     break;
                 }
             }
             assertTrue("The generated string " + str + " was not in the list of possible strings", found);
         }
-        
     }
     
     @Test
@@ -68,7 +71,7 @@ public class GenerateStringsTest {
             // Get the data
             String[][] values = getTwoAndThreeArray();
             int number = 1; for (String[] valuesSet : values) number = number * valuesSet.length;
-            String[][] data = DataFactory.generateStrings(values, number, false);
+            String[][] data = DataFactory.generateStrings(values, number, 0);
             assertEquals("This test requires there to be the chance of an absense of repetition/omission", data[0].length, data[1].length);
             StringList strings = new StringList(data[0]);
             
@@ -91,7 +94,7 @@ public class GenerateStringsTest {
     @Test
     public void testCaseRandomization(){
         // Get a set of items with no randomization, make sure the case is unchanged
-        String[] strings = DataFactory.generateStrings(getTwoAndTwoArray(), 20, false)[0];
+        String[] strings = DataFactory.generateStrings(getTwoAndTwoArray(), 20, 0)[0];
         String[] noCasePool = {"aA", "ab", "BA", "Bb"};
         // For every generated string, make sure it shows up in the list of possible strings
         for(String str : strings){
@@ -110,7 +113,7 @@ public class GenerateStringsTest {
         int count = 3;
         while(true){
             // Generate the strings
-            strings = DataFactory.generateStrings(getOneAndOneArray(), 100, true)[0];
+            strings = DataFactory.generateStrings(getOneAndOneArray(), 100, 1)[0];
             
             // Make sure each case permutation shows up in the data set
             boolean allFound = true;
@@ -157,7 +160,7 @@ public class GenerateStringsTest {
     }
     protected String[][] getTwoAndThreeArray(){
         String[] index0 = {"a", "b"};
-        String[] index1 = {"a", "b", "c"};
+        String[] index1 = {"a", "1", "c"};
         String[][] values = new String[2][];
         values[0] = index0;
         values[1] = index1;

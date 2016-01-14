@@ -6,6 +6,7 @@
 package wheelertester.data;
 
 import wheeler.generic.data.LogicHandler;
+import wheeler.generic.data.MathHandler;
 import wheeler.generic.structs.StringSimpleList;
 
 /**
@@ -14,10 +15,10 @@ import wheeler.generic.structs.StringSimpleList;
 public class DataFactory {
     
     /**Generate fifty strings. There will likely be some possible strings that don't get created and there WILL be duplicates
-     * @param randomizeCase Should the case of the generated strings be randomized?
+     * @param casingOption How should case be handled? 0 = no case action. 1 = randomize case in generated strings. 2 = randomize case in generated strings and take case into account when generating possibles list.
      * @return A two-item array of arrays of Strings; the first will be the generated strings, the second will be all possible strings created or otherwise
      */
-    public static String[][] generateFiftyStrings(boolean randomizeCase){
+    public static String[][] generateFiftyStrings(int casingOption){
         // The data that will be present in the strings
         // With each position having two, two, three, and four values, there are 48 possibilities
         String[] index0 = {"a", "b"};
@@ -30,14 +31,14 @@ public class DataFactory {
         values[2] = index2;
         values[3] = index3;
         
-        return generateStrings(values, 50, randomizeCase);
+        return generateStrings(values, 50, casingOption);
     }
     
     /**Generate 200 strings with a pool of 128 possible strings
-     * @param randomizeCase Should the case of the generated strings be randomized?
+     * @param casingOption How should case be handled? 0 = no case action. 1 = randomize case in generated strings. 2 = randomize case in generated strings and take case into account when generating possibles list.
      * @return A two-item array of arrays of Strings; the first will be the generated strings, the second will be all possible strings created or otherwise
      */
-    public static String[][] generateTwoHundredStrings(boolean randomizeCase){
+    public static String[][] generateTwoHundredStrings(int casingOption){
         // The data that will be present in the strings
         String[] index0 = {"a", "b"};           // 2
         String[] index1 = {"a", "b", "c", "d"}; // 8
@@ -49,14 +50,14 @@ public class DataFactory {
         values[2] = index2;
         values[3] = index3;
         
-        return generateStrings(values, 200, randomizeCase);
+        return generateStrings(values, 200, casingOption);
     }
     
     /**Generate 5000 strings with a pool of 9375 possible strings
-     * @param randomizeCase Should the case of the generated strings be randomized?
+     * @param casingOption How should case be handled? 0 = no case action. 1 = randomize case in generated strings. 2 = randomize case in generated strings and take case into account when generating possibles list.
      * @return A two-item array of arrays of Strings; the first will be the generated strings, the second will be all possible strings created or otherwise
      */
-    public static String[][] generateFiveThousandStrings(boolean randomizeCase){
+    public static String[][] generateFiveThousandStrings(int casingOption){
         // The data that will be present in the strings
         String[] index0 = {"a", "b", "c"};           //    3
         String[] index1 = {"a", "b", "c", "d", "e"}; //   15
@@ -72,17 +73,17 @@ public class DataFactory {
         values[4] = index4;
         values[5] = index5;
         
-        return generateStrings(values, 5000, randomizeCase);
+        return generateStrings(values, 5000, casingOption);
     }
     
     
     /**Generate strings according to the specified parameters.
      * @param values An array of arrays of strings; each array will have the values present at that index of the string (values[1] at str[1])
      * @param number The number of strings to generate
-     * @param randomizeCase Should the case of each sub-value be set at random?
+     * @param casingOption How should case be handled? 0 = no case action. 1 = randomize case in generated strings. 2 = randomize case in generated strings and take case into account when generating possibles list.
      * @return A two-item array of arrays of Strings; the first will be the generated strings, the second will be all possible strings created or otherwise
      */
-    public static String[][] generateStrings(String[][] values, int number, boolean randomizeCase){
+    public static String[][] generateStrings(String[][] values, int number, int casingOption){
         // Generate all possible values
         String[] possibles = {""};
         // Iterate for each index position
@@ -93,7 +94,12 @@ public class DataFactory {
             for(String possible : possibles){
                 // For each value for the current index, add a string composed of that value and the current possible
                 for(String value : valueSet){
-                    newPossibles.add(possible + value);
+                    if((casingOption > 1) && (value.matches(".*[a-zA-Z].*"))){
+                        newPossibles.add(possible + value.toLowerCase());
+                        newPossibles.add(possible + value.toUpperCase());
+                    }else{
+                        newPossibles.add(possible + value);
+                    }
                 }
             }
             possibles = newPossibles.toArray();
@@ -106,8 +112,8 @@ public class DataFactory {
             generated[i] = "";
             // For each values array, append one of the values from that array
             for(String[] chars : values){
-                String c = chars[LogicHandler.getRandomNumber(chars.length)];
-                if (randomizeCase) c = (LogicHandler.getRandomNumber(0, 1) > 0)
+                String c = chars[MathHandler.getRandomNumber(chars.length)];
+                if (casingOption > 0) c = (MathHandler.getRandomNumber(0, 1) > 0)
                         ? c.toUpperCase()
                         : c.toLowerCase();
                 generated[i] += c;
@@ -118,6 +124,35 @@ public class DataFactory {
         String[][] result = new String[2][];
         result[0] = generated;
         result[1] = possibles;
+        return result;
+    }
+    
+    
+    /**Generate a range of numbers in random order
+     * @param range The number of numbers to generate
+     * @return An array of numbers composed of 0 through range-1 in random order
+     */
+    public static int[] generateRandomOrder(int range){
+        return generateRandomOrder(0, range);
+    }
+    /**Generate a range of numbers in random order
+     * @param baseValue The starting value of the range
+     * @param numValues The number of values to generate
+     * @return An array of integers composed of the numValues numbers starting with baseValue in random order
+     */
+    public static int[] generateRandomOrder(int baseValue, int numValues){
+        // Set up the array, populating each number in-order
+        String[] numbers = new String[numValues];
+        for(int i = 0; i < numValues; i++){
+            numbers[i] = Integer.toString(baseValue + i);
+        }
+        // Shuffle the array (make sure we grab the result, as it doesn't do so in-place)
+        numbers = LogicHandler.shuffleArray(numbers);
+        // Cast each number to an integer and return the result
+        int[] result = new int[numValues];
+        for(int i = 0; i < numValues; i++){
+            result[i] = Integer.valueOf(numbers[i]);
+        }
         return result;
     }
     

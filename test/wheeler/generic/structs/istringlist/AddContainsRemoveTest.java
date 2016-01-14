@@ -8,6 +8,7 @@ package wheeler.generic.structs.istringlist;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Test;
 import wheeler.generic.data.FileHandler;
 import wheeler.generic.data.LogicHandler;
@@ -26,15 +27,28 @@ import wheelertester.data.TestFileHandler;
  */
 public class AddContainsRemoveTest {
     
+    @Before
+    public void setup(){
+        // The default case sensitivity
+        StringHandler.stringSorter.caseSensitive = false;
+    }
+    
     @Test
     public void testAddingCheckingAndRemovingItems() throws Exception{
+        testAddingCheckingAndRemovingItemsWorker(false);
+        testAddingCheckingAndRemovingItemsWorker(true);
+    }
+    private void testAddingCheckingAndRemovingItemsWorker(boolean caseSensitive) throws Exception{
+        // Set the current StringSorter to handle case sensitivity as appropriate
+        StringHandler.stringSorter.caseSensitive = caseSensitive;
+        
         // Get some test data (if we failed earlier, use the data that caused us to fail)
-        String testFolder = TestFileHandler.callGetTestFolder(0);
-        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateFiftyStrings(true));
+        String testFolder = TestFileHandler.callGetTestFolder(caseSensitive ? "withCase" : "noCase", 0);
+        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateFiftyStrings(caseSensitive ? 2 : 1));
         
         // Get an array of test lists, run the test for each list using the same data
         IStringList[] lists = TestStringList.getStringLists();
-        for (IStringList list : lists) testAddingCheckingAndRemovingItemsWorker(list, data);
+        for (IStringList list : lists) testAddingCheckingAndRemovingItemsWorker(list, data, caseSensitive);
         
         // The tests all passed, delete the stored data so we start with a fresh set next time
         FileHandler.deleteFolder(testFolder);
@@ -42,13 +56,20 @@ public class AddContainsRemoveTest {
     
     @Test
     public void testLargeList() throws Exception{
+        testLargeListWorker(false);
+        testLargeListWorker(true);
+    }
+    private void testLargeListWorker(boolean caseSensitive) throws Exception{
+        // Set the current StringSorter to handle case sensitivity as appropriate
+        StringHandler.stringSorter.caseSensitive = caseSensitive;
+        
         // Get some test data (if we failed earlier, use the data that caused us to fail)
-        String testFolder = TestFileHandler.callGetTestFolder(0);
-        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateTwoHundredStrings(true));
+        String testFolder = TestFileHandler.callGetTestFolder(caseSensitive ? "withCase" : "noCase", 0);
+        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateTwoHundredStrings(caseSensitive ? 2 : 1));
         
         // Get an array of test lists, run the test for each list using the same data
         IStringList[] lists = TestStringList.getStringLists();
-        for (IStringList list : lists) testAddingCheckingAndRemovingItemsWorker(list, data);
+        for (IStringList list : lists) testAddingCheckingAndRemovingItemsWorker(list, data, caseSensitive);
         
         // The tests all passed, delete the stored data so we start with a fresh set next time
         FileHandler.deleteFolder(testFolder);
@@ -58,11 +79,11 @@ public class AddContainsRemoveTest {
     public void testMassiveSortedList() throws Exception{
         // Get some test data (if we failed earlier, use the data that caused us to fail)
         String testFolder = TestFileHandler.callGetTestFolder(0);
-        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateFiveThousandStrings(true));
+        String[][] data = generateOrRetrieveTestData(testFolder, DataFactory.generateFiveThousandStrings(1));
         
         // StringSortedList is specially designed for handling enormous lists like these, since it has to do so while keeping the list sorted
         // Just use the base StringSortedList; calling isValid 10,000 times on a list with an average of 2,500 items is EXPENSIVE
-        testAddingCheckingAndRemovingItemsWorker(new StringSortedList(), data);
+        testAddingCheckingAndRemovingItemsWorker(new StringSortedList(), data, false);
         
         // The tests all passed, delete the stored data so we start with a fresh set next time
         FileHandler.deleteFolder(testFolder);
@@ -98,7 +119,7 @@ public class AddContainsRemoveTest {
     }
     
     // Do the test work
-    private void testAddingCheckingAndRemovingItemsWorker(IStringList list, String[][] data) throws Exception{
+    private void testAddingCheckingAndRemovingItemsWorker(IStringList list, String[][] data, boolean caseSensitive) throws Exception{
         // De-reference the data in the data array
         String[] strings = data[0]; // The strings to be added to the list in turn
         String[] pool = data[1];    // All possible strings
@@ -125,7 +146,7 @@ public class AddContainsRemoveTest {
             list.add(strings[i]);
             if (sortedList != null) sortedList.isValid(null);
             for(int j = 0; j < pool.length; j++){
-                if(StringHandler.areEqual(strings[i], pool[j], false)){
+                if(StringHandler.areEqual(strings[i], pool[j], caseSensitive)){
                     counts[j]++;
                     assertEquals(
                             "The number of times " + strings[i] + " appears in the list failed to increase correctly",
@@ -161,7 +182,7 @@ public class AddContainsRemoveTest {
         }
         for(String item : remove){
             for(int i = 0; i < pool.length; i++){
-                if(StringHandler.areEqual(item, pool[i], false)){
+                if(StringHandler.areEqual(item, pool[i], caseSensitive)){
                     assertEquals("While removing " + item + ", found it the wrong number of times", counts[i], list.remove(item));
                     if (sortedList != null) sortedList.isValid(null);
                     assertEquals("Found a string in the list after removing it", 0, list.count(item));
