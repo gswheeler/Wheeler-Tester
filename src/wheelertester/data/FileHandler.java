@@ -12,7 +12,7 @@ import wheeler.generic.data.LogicHandler;
  */
 public class FileHandler extends wheeler.generic.data.FileHandler {
     
-    protected static String programFolder = "C:\\Program Files\\Wheeler\\Wheeler Tester";
+    protected static String testerFolder = "C:\\Program Files\\Wheeler\\Wheeler Tester";
     protected static boolean programFolderTested = false;
     
     /**
@@ -34,13 +34,13 @@ public class FileHandler extends wheeler.generic.data.FileHandler {
     protected static String getTestFolder(int indirection) throws Exception{
         // Make sure we can access the Wheeler Tester folder
         if(!programFolderTested){
-            testProgramFolder(programFolder, null);
+            testProgramFolder(testerFolder, null);
             programFolderTested = true;
         }
         
         // Compose and return the filepath
         return composeFilepath(
-                composeFilepath(programFolder, "test"),
+                composeFilepath(testerFolder, "test"),
                 LogicHandler.getCallingMethod(indirection + 1)
             );
     }
